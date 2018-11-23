@@ -1,3 +1,5 @@
+importScripts('./idb-keyval-iife.min');
+
 //Runs in bg
 var CACHE_NAME = 'my-site-cache-v1';
 var urlsToCache = [
@@ -35,4 +37,25 @@ self.addEventListener('fetch', function(event) {
         }
       )
     );
+  });
+
+  self.addEventListener('sync', function(event) {
+    if (event.tag == 'myFirstSync') {
+      event.waitUntil(
+        idbKeyval.get('todos').then(function(todos) {
+            return idbKeyval.get('todos', function(login) {
+                return fetch(SERVER_URL + '/todos/' + login, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8',
+                    },
+                    body: JSON.stringify(todos)
+                }).then(() => {
+                    this.fetchTodos()
+                    document.getElementById('todoText').value = ''
+                }).catch(console.error)
+            })
+        })
+      );
+    }
   });

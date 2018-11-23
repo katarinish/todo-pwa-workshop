@@ -61,8 +61,19 @@ class Content extends React.Component {
 	}
 
 	addTodo(text) {
-		this.postTodos([...this.state.todos, { title: text, completed: false, id: this.state.todos.length + 1 }])
-	}
+        // this.postTodos([...this.state.todos, { title: text, completed: false, id: this.state.todos.length + 1 }])
+        this.syncTodos([...this.state.todos, { title: text, completed: false, id: this.state.todos.length + 1 }])
+
+    }
+    
+    syncTodos(todos) {
+        navigator.serviceWorker.ready.then(function(swRegistration) {
+            // storing logic
+            idbKeyval.set('todos', todos).then(() => {
+                return swRegistration.sync.register('myFirstSync');
+            });
+          });
+    }
 
 	postTodos(todos){
 		fetch(SERVER_URL + '/todos/' + this.props.login, {
@@ -74,7 +85,9 @@ class Content extends React.Component {
 		}).then(() => {
 			this.fetchTodos()
 			document.getElementById('todoText').value = ''
-		}).catch(console.error)
+        }).catch(console.error)
+        
+        this.setState({todos})
 	}
 
 	toggleTodo(todoID) {
@@ -84,7 +97,8 @@ class Content extends React.Component {
 			}
 			return todo
 		})
-		this.postTodos(todos)
+        // this.postTodos(todos)
+        this.syncTodos(todos);
 	}
 
 	render() {
@@ -122,7 +136,8 @@ class App extends React.Component {
 	}
 
 	login(login) {
-		localStorage.setItem('login', login)
+        localStorage.setItem('login', login)
+        idbKeyval.set('login', login);
 		this.setState({login})
 	}
 

@@ -5,7 +5,11 @@ var urlsToCache = [
   '/script.js',
   '/register-sw.js',
   '/styles.css',
-  '/img/feather-sprite.svg'
+  '/img/feather-sprite.svg',
+  'https://unpkg.com/react@16/umd/react.development.js',
+  'https://unpkg.com/react-dom@16/umd/react-dom.development.js',
+  'https://unpkg.com/babel-standalone@latest/babel.min.js',
+  'https://fonts.googleapis.com/css?family=Roboto'
 ];
 
 self.addEventListener('install', function(event) {
@@ -32,4 +36,3 @@ self.addEventListener('fetch', function(event) {
       )
     );
   });
-  
